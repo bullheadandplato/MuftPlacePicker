@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="FullScreenDialogStyle" parent="Theme.MaterialComponents.Dialog">
+    <style name="FullScreenDialogStyle" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">false</item>
         <item name="android:windowIsFloating">false</item>

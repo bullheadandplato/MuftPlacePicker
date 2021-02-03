@@ -4,9 +4,9 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.bullhead.android.muftplacepicker.PlacePicker;
 import com.bullhead.android.muftplacepicker.PlacePickerMapOptions;
 import com.bullhead.android.muftplacepicker.PlacePickerUiOptions;
+import com.bullhead.android.muftplacepicker.ui.PlacePicker;
 
 public class MainActivity extends AppCompatActivity {
 

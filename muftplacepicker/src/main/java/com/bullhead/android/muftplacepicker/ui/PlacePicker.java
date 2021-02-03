@@ -1,4 +1,4 @@
-package com.bullhead.android.muftplacepicker;
+package com.bullhead.android.muftplacepicker.ui;
 
 import android.app.Dialog;
 import android.app.UiModeManager;
@@ -17,6 +17,9 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.bullhead.android.muftplacepicker.PlacePickerMapOptions;
+import com.bullhead.android.muftplacepicker.PlacePickerUiOptions;
+import com.bullhead.android.muftplacepicker.R;
 import com.google.android.material.appbar.AppBarLayout;
 
 import org.osmdroid.api.IMapController;
@@ -138,6 +141,7 @@ public class PlacePicker extends DialogFragment {
         AppBarLayout appBarLayout = view.findViewById(R.id.baseAppBar);
         SearchView   searchView   = view.findViewById(R.id.searchView);
         searchView.setTextColor(ContextCompat.getColor(context, options.getSearchTextColor()));
+        searchView.setBackgroundColor(ContextCompat.getColor(context, options.getSecondaryColor()));
     }
 
     private void setupToolbar() {

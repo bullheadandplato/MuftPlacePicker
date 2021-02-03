@@ -1,10 +1,11 @@
-package com.bullhead.android.muftplacepicker;
+package com.bullhead.android.muftplacepicker.util;
 
 import android.content.Context;
 import android.graphics.Color;
 
 import androidx.annotation.NonNull;
 
+import com.bullhead.android.muftplacepicker.R;
 import com.google.android.material.color.MaterialColors;
 
 public final class ColorTool {

@@ -7,19 +7,18 @@
     android:layout_height="wrap_content"
     app:cardCornerRadius="5dp">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <EditText
             android:id="@+id/etSearch"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginEnd="50dp"
             android:background="@null"
             android:hint="@string/search"
-            android:imeOptions="actionDone"
+            android:imeOptions="actionSearch"
             android:importantForAutofill="no"
             android:inputType="text"
             android:maxLength="50"
@@ -27,5 +26,17 @@
             android:padding="10dp"
             android:textCursorDrawable="@null" />
 
-    </RelativeLayout>
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+    </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
