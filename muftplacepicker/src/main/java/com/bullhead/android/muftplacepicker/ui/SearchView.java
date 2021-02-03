@@ -3,18 +3,16 @@ package com.bullhead.android.muftplacepicker.ui;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.graphics.ColorUtils;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -36,6 +34,7 @@ public class SearchView extends LinearLayout {
     private RecyclerView       recyclerView;
     private InputMethodManager inputMethodManager;
     private Disposable         disposable;
+    private Button             closeButton;
 
 
     public SearchView(Context context) {
@@ -60,6 +59,12 @@ public class SearchView extends LinearLayout {
         etSearch     = findViewById(R.id.etSearch);
         recyclerView = findViewById(R.id.recyclerView);
         progressBar  = findViewById(R.id.progressBar);
+        closeButton  = findViewById(R.id.closeButton);
+        closeButton.setOnClickListener(v -> {
+            recyclerView.setAdapter(null);
+            recyclerView.setVisibility(GONE);
+            closeButton.setVisibility(GONE);
+        });
         etSearch.requestFocus();
         etSearch.setOnEditorActionListener((v, actionId, event) -> {
             search();
@@ -83,37 +88,23 @@ public class SearchView extends LinearLayout {
         }
     }
 
-    @NonNull
-    public MaterialCardView getCardView() {
-        return searchView;
-    }
-
-    public void focusSearch() {
-        new Handler(Looper.getMainLooper())
-                .postDelayed(() -> {
-                    etSearch.requestFocus();
-                    inputMethodManager.toggleSoftInputFromWindow(etSearch.getWindowToken(),
-                            InputMethodManager.SHOW_IMPLICIT, 0);
-                }, 200);
-
-    }
-
     private void search() {
         toggleProgress(false);
-        String text = etSearch.getText().toString();
+        String query = etSearch.getText().toString().trim();
         if (disposable != null) {
             disposable.dispose();
         }
-        if (TextUtils.isEmpty(text)) {
+        if (TextUtils.isEmpty(query)) {
             return;
         }
         toggleProgress(true);
         disposable = ApiProvider.getInstance()
-                .search(text)
+                .search(query)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnEvent((event, error) -> toggleProgress(false))
                 .subscribe(places -> {
+                    closeButton.setVisibility(VISIBLE);
                     recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
                     recyclerView.setAdapter(new SearchAdapter(places));
                     recyclerView.setVisibility(VISIBLE);
@@ -125,6 +116,7 @@ public class SearchView extends LinearLayout {
     private void toggleProgress(boolean show) {
         if (show) {
             recyclerView.setVisibility(GONE);
+            closeButton.setVisibility(GONE);
             progressBar.setVisibility(VISIBLE);
         } else {
             progressBar.setVisibility(GONE);

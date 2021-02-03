@@ -37,11 +37,13 @@ public final class ApiProvider {
     @NonNull
     public Single<List<Place>> search(@NonNull String query) {
         return service.search(query)
-                .map(places -> {
+                .flatMap(places -> {
                     if (places.size() > 5) {
-                        return places.subList(0, 5);
+                        return Single.just(places.subList(0, 5));
+                    } else if (places.size() == 0) {
+                        return Single.error(new Exception("no result for " + query));
                     }
-                    return places;
+                    return Single.just(places);
                 });
     }
 
