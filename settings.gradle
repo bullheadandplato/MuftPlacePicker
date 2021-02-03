@@ -1,0 +1,3 @@
+include ':muftplacepicker'
+include ':app'
+rootProject.name = "Osm Place Picker"

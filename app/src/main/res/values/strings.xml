@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Osm Place Picker</string>
+    <string name="place_pick">Place Picker</string>
+    <string name="show_picker">Show Picker</string>
+</resources>
