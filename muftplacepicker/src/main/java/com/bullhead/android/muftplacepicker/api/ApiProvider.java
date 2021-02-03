@@ -38,7 +38,7 @@ public final class ApiProvider {
     public Single<List<Place>> search(@NonNull String query) {
         return service.search(query)
                 .map(places -> {
-                    if (places.size() > 0) {
+                    if (places.size() > 5) {
                         return places.subList(0, 5);
                     }
                     return places;

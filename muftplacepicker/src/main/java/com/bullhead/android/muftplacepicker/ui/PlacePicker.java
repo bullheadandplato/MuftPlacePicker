@@ -142,6 +142,7 @@ public class PlacePicker extends DialogFragment {
         SearchView   searchView   = view.findViewById(R.id.searchView);
         searchView.setTextColor(ContextCompat.getColor(context, options.getSearchTextColor()));
         searchView.setBackgroundColor(ContextCompat.getColor(context, options.getSecondaryColor()));
+        searchView.setProgressColor(ContextCompat.getColor(context, options.getPrimaryColor()));
     }
 
     private void setupToolbar() {

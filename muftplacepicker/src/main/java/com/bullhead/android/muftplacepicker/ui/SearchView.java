@@ -1,6 +1,7 @@
 package com.bullhead.android.muftplacepicker.ui;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.os.Handler;
 import android.os.Looper;
@@ -139,5 +140,9 @@ public class SearchView extends LinearLayout {
     @Override
     public void setBackgroundColor(int color) {
         searchView.setCardBackgroundColor(color);
+    }
+
+    public void setProgressColor(int color) {
+        progressBar.setIndeterminateTintList(ColorStateList.valueOf(color));
     }
 }
