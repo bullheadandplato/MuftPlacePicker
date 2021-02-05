@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.bullhead.android.muftplacepicker.domain.Place;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Single;
 import retrofit2.Retrofit;
@@ -37,6 +38,7 @@ public final class ApiProvider {
     @NonNull
     public Single<List<Place>> search(@NonNull String query) {
         return service.search(query)
+                .delay(5, TimeUnit.SECONDS)
                 .flatMap(places -> {
                     if (places.size() > 5) {
                         return Single.just(places.subList(0, 5));
@@ -48,14 +50,9 @@ public final class ApiProvider {
     }
 
     @NonNull
-    public Single<String> reverseAddress(double lat, double lng) {
+    public Single<Place> reverse(double lat, double lng) {
         return service.reverse(lat, lng)
-                .flatMap(reverseResponse -> {
-                    if (reverseResponse.getDisplayName() != null) {
-                        return Single.just(reverseResponse.getDisplayName());
-                    }
-                    return Single.error(new Exception("No address found"));
-                });
+                .delay(5, TimeUnit.SECONDS);
     }
 
 

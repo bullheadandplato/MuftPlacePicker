@@ -26,9 +26,13 @@ import com.google.android.material.appbar.AppBarLayout;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
+import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MapEventsOverlay;
+import org.osmdroid.views.overlay.Marker;
 
 import static android.content.Context.UI_MODE_SERVICE;
 
@@ -42,6 +46,7 @@ public class PlacePicker extends DialogFragment {
     private MapView               mapView;
     private IMapController        mapController;
     private Consumer<Place>       selectListener;
+    private Marker                tapMarker;
 
     @NonNull
     public static PlacePicker show(@NonNull PlacePickerUiOptions options,
@@ -85,6 +90,29 @@ public class PlacePicker extends DialogFragment {
         mapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
         mapView.setMultiTouchControls(true);
         mapController.setCenter(mapOptions.getCenter());
+        final MapEventsReceiver mReceive = new MapEventsReceiver() {
+            @Override
+            public boolean singleTapConfirmedHelper(GeoPoint p) {
+                updateMarker(p);
+                return false;
+            }
+
+            @Override
+            public boolean longPressHelper(GeoPoint p) {
+                return false;
+            }
+        };
+        mapView.getOverlays().add(new MapEventsOverlay(mReceive));
+    }
+
+    private void updateMarker(GeoPoint position) {
+        if (tapMarker == null) {
+            tapMarker = new Marker(mapView);
+            tapMarker.setDefaultIcon();
+            mapView.getOverlays().add(tapMarker);
+        }
+        tapMarker.setPosition(position);
+        mapView.invalidate();
     }
 
     @Override
