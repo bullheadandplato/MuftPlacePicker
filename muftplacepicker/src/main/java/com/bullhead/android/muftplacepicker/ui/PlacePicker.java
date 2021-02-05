@@ -14,12 +14,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.core.util.Consumer;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.bullhead.android.muftplacepicker.PlacePickerMapOptions;
 import com.bullhead.android.muftplacepicker.PlacePickerUiOptions;
 import com.bullhead.android.muftplacepicker.R;
+import com.bullhead.android.muftplacepicker.domain.Place;
 import com.google.android.material.appbar.AppBarLayout;
 
 import org.osmdroid.api.IMapController;
@@ -39,17 +41,12 @@ public class PlacePicker extends DialogFragment {
     private PlacePickerMapOptions mapOptions;
     private MapView               mapView;
     private IMapController        mapController;
-
-
-    private Context context;
-    private boolean nightMode;
-
-    @Nullable
-    private CloseListener closeListener;
+    private Consumer<Place>       selectListener;
 
     @NonNull
     public static PlacePicker show(@NonNull PlacePickerUiOptions options,
                                    @NonNull PlacePickerMapOptions mapOptions,
+                                   @Nullable Consumer<Place> listener,
                                    @NonNull FragmentManager fm) {
         Bundle args = new Bundle();
         args.putSerializable("options", options);
@@ -57,7 +54,15 @@ public class PlacePicker extends DialogFragment {
         PlacePicker placePicker = new PlacePicker();
         placePicker.setArguments(args);
         placePicker.show(fm, "terms");
+        placePicker.selectListener = listener;
         return placePicker;
+    }
+
+    private Context context;
+    private boolean nightMode;
+
+    public void setSelectListener(@Nullable Consumer<Place> selectListener) {
+        this.selectListener = selectListener;
     }
 
 
@@ -80,19 +85,6 @@ public class PlacePicker extends DialogFragment {
         mapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
         mapView.setMultiTouchControls(true);
         mapController.setCenter(mapOptions.getCenter());
-    }
-
-    public void setCloseListener(@Nullable CloseListener closeListener) {
-        this.closeListener = closeListener;
-    }
-
-    @Override
-    public void dismiss() {
-        super.dismiss();
-        if (closeListener != null) {
-            closeListener.onClose();
-        }
-
     }
 
     @Override
@@ -145,7 +137,10 @@ public class PlacePicker extends DialogFragment {
         searchView.setProgressColor(ContextCompat.getColor(context, options.getPrimaryColor()));
         searchView.setPlaceSelectListener(place -> {
             new SelectPlaceDialog(context, place, place1 -> {
-
+                if (selectListener != null) {
+                    selectListener.accept(place1);
+                }
+                dismiss();
             }).show();
         });
     }
@@ -180,11 +175,6 @@ public class PlacePicker extends DialogFragment {
     public void onDetach() {
         super.onDetach();
         this.context = null;
-    }
-
-
-    public interface CloseListener {
-        void onClose();
     }
 }
 

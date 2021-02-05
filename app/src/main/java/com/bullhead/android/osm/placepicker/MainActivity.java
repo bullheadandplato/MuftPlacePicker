@@ -1,6 +1,7 @@
 package com.bullhead.android.osm.placepicker;
 
 import android.os.Bundle;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,6 +15,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        TextView placeTextView = findViewById(R.id.placeTextView);
         findViewById(R.id.placePickerButton)
                 .setOnClickListener(v -> {
                     PlacePicker.show(PlacePickerUiOptions.builder()
@@ -24,6 +26,9 @@ public class MainActivity extends AppCompatActivity {
                             PlacePickerMapOptions.builder()
                                     .zoom(16)
                                     .build(),
+                            place -> {
+                                placeTextView.setText(place.getDisplayName());
+                            },
                             getSupportFragmentManager());
                 });
 

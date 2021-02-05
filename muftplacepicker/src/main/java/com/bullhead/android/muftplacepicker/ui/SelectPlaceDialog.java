@@ -17,15 +17,13 @@ import com.bumptech.glide.Glide;
 import org.osmdroid.util.GeoPoint;
 
 public class SelectPlaceDialog extends Dialog {
-    private final Place                    place;
-    private       DialogSelectPlaceBinding binding;
+    private DialogSelectPlaceBinding binding;
 
     public SelectPlaceDialog(@NonNull Context context,
                              @NonNull Place place,
                              @NonNull Consumer<Place> onDone) {
         super(context);
         setCancelable(false);
-        this.place = place;
         if (this.getWindow() != null) {
             this.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
             this.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
@@ -42,6 +40,9 @@ public class SelectPlaceDialog extends Dialog {
                     .into(binding.imageView);
         }
         binding.cancelButton.setOnClickListener(v -> dismiss());
-        binding.okButton.setOnClickListener(v -> onDone.accept(place));
+        binding.okButton.setOnClickListener(v -> {
+            dismiss();
+            onDone.accept(place);
+        });
     }
 }
