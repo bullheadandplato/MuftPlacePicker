@@ -17,7 +17,7 @@ public final class StaticImageProvider {
 
     @NonNull
     public static String get(@NonNull GeoPoint point) {
-        return String.format(Locale.ENGLISH, URL, point.getLatitude(), point.getLongitude())
+        return String.format(Locale.ENGLISH, URL, point.getLongitude(), point.getLatitude())
                 .replace("\"", "%22"); //replace " with encoded char for url
     }
 }

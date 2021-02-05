@@ -17,11 +17,13 @@ import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.graphics.ColorUtils;
+import androidx.core.util.Consumer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bullhead.android.muftplacepicker.R;
 import com.bullhead.android.muftplacepicker.api.ApiProvider;
+import com.bullhead.android.muftplacepicker.domain.Place;
 import com.bullhead.android.muftplacepicker.ui.search.SearchAdapter;
 import com.google.android.material.card.MaterialCardView;
 
@@ -38,6 +40,11 @@ public class SearchView extends LinearLayout {
     private Disposable         disposable;
     private Button             closeButton;
 
+    private Consumer<Place> placeSelectListener;
+
+    public void setPlaceSelectListener(@NonNull Consumer<Place> placeSelectListener) {
+        this.placeSelectListener = placeSelectListener;
+    }
 
     public SearchView(Context context) {
         super(context);
@@ -121,7 +128,14 @@ public class SearchView extends LinearLayout {
                 .subscribe(places -> {
                     closeButton.setVisibility(VISIBLE);
                     recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                    recyclerView.setAdapter(new SearchAdapter(places));
+                    SearchAdapter adapter = new SearchAdapter(places);
+                    adapter.setListener((item, position) -> {
+                        if (placeSelectListener != null) {
+                            placeSelectListener.accept(item);
+                        }
+                        closeButton.performClick();
+                    });
+                    recyclerView.setAdapter(adapter);
                     recyclerView.setVisibility(VISIBLE);
                 }, error -> {
                     Log.e("TAG", "onTextChanged: " + error.getLocalizedMessage());

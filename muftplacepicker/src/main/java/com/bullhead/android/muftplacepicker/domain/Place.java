@@ -2,7 +2,11 @@ package com.bullhead.android.muftplacepicker.domain;
 
 import android.text.TextUtils;
 
+import androidx.annotation.Nullable;
+
 import com.google.gson.annotations.SerializedName;
+
+import org.osmdroid.util.GeoPoint;
 
 import java.io.Serializable;
 import java.util.List;
@@ -72,6 +76,15 @@ public class Place implements Serializable {
                     .append(address.getCountry());
         }
         return builder.toString();
+    }
+
+    @Nullable
+    public GeoPoint location() {
+        try {
+            return new GeoPoint(Double.parseDouble(lat), Double.parseDouble(lon));
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }

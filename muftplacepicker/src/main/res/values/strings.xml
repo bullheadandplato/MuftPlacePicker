@@ -2,4 +2,7 @@
 <resources>
     <string name="search">Search</string>
     <string name="close">Close</string>
+    <string name="select_place">Select Place</string>
+    <string name="cancel">Cancel</string>
+    <string name="select_button_dialog_text">Select</string>
 </resources>
