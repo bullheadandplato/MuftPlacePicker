@@ -3,6 +3,7 @@ package com.bullhead.android.muftplacepicker.ui;
 import android.app.Dialog;
 import android.app.UiModeManager;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,17 +13,19 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.util.Consumer;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bullhead.android.muftplacepicker.PlacePickerMapOptions;
 import com.bullhead.android.muftplacepicker.PlacePickerUiOptions;
 import com.bullhead.android.muftplacepicker.R;
+import com.bullhead.android.muftplacepicker.api.ApiProvider;
+import com.bullhead.android.muftplacepicker.databinding.DialogFullscreenBinding;
 import com.bullhead.android.muftplacepicker.domain.Place;
-import com.google.android.material.appbar.AppBarLayout;
+import com.bullhead.android.muftplacepicker.ui.search.SearchAdapter;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -30,23 +33,29 @@ import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
-import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 
+import java.util.ArrayList;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 import static android.content.Context.UI_MODE_SERVICE;
+import static android.view.View.VISIBLE;
 
 @SuppressWarnings({"WeakerAccess"})
 public class PlacePicker extends DialogFragment {
     private static final String TAG = PlacePicker.class.getSimpleName();
 
-    private Toolbar               toolbar;
-    private PlacePickerUiOptions  options;
-    private PlacePickerMapOptions mapOptions;
-    private MapView               mapView;
-    private IMapController        mapController;
-    private Consumer<Place>       selectListener;
-    private Marker                tapMarker;
+    private PlacePickerUiOptions    options;
+    private PlacePickerMapOptions   mapOptions;
+    private IMapController          mapController;
+    private Consumer<Place>         selectListener;
+    private Marker                  tapMarker;
+    private Disposable              disposable;
+    private DialogFullscreenBinding binding;
 
     @NonNull
     public static PlacePicker show(@NonNull PlacePickerUiOptions options,
@@ -84,11 +93,11 @@ public class PlacePicker extends DialogFragment {
     }
 
     private void fixMap() {
-        mapView.setTileSource(TileSourceFactory.MAPNIK);
-        mapController = mapView.getController();
+        binding.mapView.setTileSource(TileSourceFactory.MAPNIK);
+        mapController = binding.mapView.getController();
         mapController.setZoom(mapOptions.getZoom());
-        mapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
-        mapView.setMultiTouchControls(true);
+        binding.mapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
+        binding.mapView.setMultiTouchControls(true);
         mapController.setCenter(mapOptions.getCenter());
         final MapEventsReceiver mReceive = new MapEventsReceiver() {
             @Override
@@ -102,17 +111,51 @@ public class PlacePicker extends DialogFragment {
                 return false;
             }
         };
-        mapView.getOverlays().add(new MapEventsOverlay(mReceive));
+        binding.mapView.getOverlays().add(new MapEventsOverlay(mReceive));
     }
 
     private void updateMarker(GeoPoint position) {
         if (tapMarker == null) {
-            tapMarker = new Marker(mapView);
+            tapMarker = new Marker(binding.mapView);
             tapMarker.setDefaultIcon();
-            mapView.getOverlays().add(tapMarker);
+            binding.mapView.getOverlays().add(tapMarker);
         }
         tapMarker.setPosition(position);
-        mapView.invalidate();
+        binding.mapView.invalidate();
+        loadPlace(position);
+    }
+
+    private void loadPlace(@NonNull GeoPoint point) {
+        if (disposable != null) {
+            disposable.dispose();
+        }
+        toggleProgress(true);
+        disposable = ApiProvider.getInstance().reverse(point.getLatitude(), point.getLongitude())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnEvent((ev, e) -> toggleProgress(false))
+                .subscribe(place -> {
+                    binding.rv.setLayoutManager(new LinearLayoutManager(getContext()));
+                    SearchAdapter adapter = new SearchAdapter(new ArrayList<Place>() {{
+                        add(place);
+                    }});
+                    adapter.setListener((item, position) -> {
+                        showSelectDialog(item);
+                    });
+                    binding.rv.setAdapter(adapter);
+                    binding.rv.setVisibility(VISIBLE);
+                }, error -> {
+
+                });
+    }
+
+    private void toggleProgress(boolean show) {
+        if (show) {
+            binding.rv.setVisibility(View.GONE);
+            binding.pb.setVisibility(VISIBLE);
+        } else {
+            binding.pb.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -149,38 +192,27 @@ public class PlacePicker extends DialogFragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.dialog_fullscreen,
-                container, false);
-        setupViews(view);
-        setupToolbar();
-        return view;
+        binding = DialogFullscreenBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
-    private void setupViews(@NonNull View view) {
-        toolbar = view.findViewById(R.id.toolbar);
-        AppBarLayout appBarLayout = view.findViewById(R.id.baseAppBar);
-        SearchView   searchView   = view.findViewById(R.id.searchView);
-        searchView.setTextColor(ContextCompat.getColor(context, options.getSearchTextColor()));
-        searchView.setBackgroundColor(ContextCompat.getColor(context, options.getSecondaryColor()));
-        searchView.setProgressColor(ContextCompat.getColor(context, options.getPrimaryColor()));
-        searchView.setPlaceSelectListener(place -> {
-            new SelectPlaceDialog(context, place, place1 -> {
-                if (selectListener != null) {
-                    selectListener.accept(place1);
-                }
-                dismiss();
-            }).show();
-        });
+    private void showSelectDialog(Place place) {
+        new SelectPlaceDialog(context, place, place1 -> {
+            if (selectListener != null) {
+                selectListener.accept(place1);
+            }
+            dismiss();
+        }).show();
     }
 
     private void setupToolbar() {
-        toolbar.setNavigationIcon(R.drawable.ic_round_close_24);
-        assert toolbar.getNavigationIcon() != null;
-        toolbar.getNavigationIcon().setTint(ContextCompat.getColor(context, options.getPrimaryColor()));
-        toolbar.setNavigationOnClickListener(view1 -> dismiss());
-        toolbar.setBackgroundColor(ContextCompat.getColor(context, options.getSecondaryColor()));
-        toolbar.setTitle(options.getSearchTextColor());
-        toolbar.setTitleTextColor(ContextCompat.getColor(context, options.getPrimaryColor()));
+        binding.toolbar.setNavigationIcon(R.drawable.ic_round_close_24);
+        assert binding.toolbar.getNavigationIcon() != null;
+        binding.toolbar.getNavigationIcon().setTint(ContextCompat.getColor(context, options.getPrimaryColor()));
+        binding.toolbar.setNavigationOnClickListener(view1 -> dismiss());
+        binding.toolbar.setBackgroundColor(ContextCompat.getColor(context, options.getSecondaryColor()));
+        binding.toolbar.setTitle(options.getSearchTextColor());
+        binding.toolbar.setTitleTextColor(ContextCompat.getColor(context, options.getPrimaryColor()));
     }
 
     @Override
@@ -195,7 +227,13 @@ public class PlacePicker extends DialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mapView = view.findViewById(R.id.mapView);
+        binding.searchView.setTextColor(ContextCompat.getColor(context, options.getSearchTextColor()));
+        binding.searchView.setBackgroundColor(ContextCompat.getColor(context, options.getSecondaryColor()));
+        binding.searchView.setProgressColor(ContextCompat.getColor(context, options.getPrimaryColor()));
+        binding.searchView.setPlaceSelectListener(this::showSelectDialog);
+        binding.pb.setIndeterminateTintList(ColorStateList.valueOf(ContextCompat
+                .getColor(context, options.getPrimaryColor())));
+        setupToolbar();
         fixMap();
     }
 
@@ -203,6 +241,15 @@ public class PlacePicker extends DialogFragment {
     public void onDetach() {
         super.onDetach();
         this.context = null;
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (disposable != null) {
+            disposable.dispose();
+        }
+        binding = null;
+        super.onDestroyView();
     }
 }
 
