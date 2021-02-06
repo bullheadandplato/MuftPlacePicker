@@ -59,7 +59,7 @@ public class PlacePickerMapOptions implements Serializable {
                 center = lahore();
             }
             if (zoom == 0) {
-                zoom = 15;
+                zoom = 19.8f;
             }
             return new PlacePickerMapOptions(center, zoom);
         }
