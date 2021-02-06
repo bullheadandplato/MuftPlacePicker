@@ -39,7 +39,7 @@ public class PlacePickerMapOptions implements Serializable {
 
         @NonNull
         private GeoPoint lahore() {
-            return new GeoPoint(31.582045, 74.329376);
+            return new GeoPoint(31.382107, 74.188583);
         }
 
         @NonNull

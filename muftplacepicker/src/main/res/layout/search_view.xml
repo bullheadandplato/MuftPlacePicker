@@ -23,8 +23,7 @@
             android:inputType="text"
             android:maxLength="50"
             android:maxLines="1"
-            android:padding="10dp"
-            android:textCursorDrawable="@null" />
+            android:padding="10dp" />
 
         <ProgressBar
             android:id="@+id/progressBar"

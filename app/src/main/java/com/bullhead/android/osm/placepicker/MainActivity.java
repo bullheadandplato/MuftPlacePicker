@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
                                     .searchTextColor(R.color.black)
                                     .build(),
                             PlacePickerMapOptions.builder()
+                                    .zoom(16)
                                     .build(),
                             place -> {
                                 placeTextView.setText(place.getDisplayName());

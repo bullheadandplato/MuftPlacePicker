@@ -58,7 +58,10 @@ public class Place implements Serializable {
         if (address == null) {
             return displayName;
         }
-        StringBuilder builder = new StringBuilder(address.getPostcode());
+        StringBuilder builder = new StringBuilder();
+        if (!TextUtils.isEmpty(address.getPostcode())) {
+            builder.append(address.getPostcode());
+        }
         if (!TextUtils.isEmpty(address.getRoad())) {
             builder.append(",")
                     .append(address.getRoad());
