@@ -9,7 +9,7 @@ import java.util.Locale;
 public final class StaticImageProvider {
     //https://github.com/jperelli/osm-static-maps
     private static final String URL = "http://osm-static-maps.herokuapp.com/?" +
-            "geojson={\"type\":\"Point\",\"coordinates\":[%f,%f]}";
+            "geojson={\"type\":\"Point\",\"coordinates\":[%f,%f]}&height=200&width=250";
 
     private StaticImageProvider() {
         throw new AssertionError("Not instantiable");
