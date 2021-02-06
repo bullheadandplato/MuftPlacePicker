@@ -27,7 +27,7 @@ public class SearchItemViewHolder extends BaseViewHolder<Place> {
 
     @Override
     public <X extends Place> void bind(@NonNull X t) {
-        binding.nameTextView.setText(t.getDisplayName());
+        binding.nameTextView.setText(t.getName());
         binding.addressTextView.setText(t.formattedAddress());
     }
 }

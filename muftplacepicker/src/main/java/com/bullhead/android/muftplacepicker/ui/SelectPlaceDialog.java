@@ -31,7 +31,7 @@ public class SelectPlaceDialog extends Dialog {
         binding = DialogSelectPlaceBinding.inflate(LayoutInflater.from(context));
         setContentView(binding.getRoot());
         binding.addressTextView.setText(place.formattedAddress());
-        binding.nameTextView.setText(place.getDisplayName());
+        binding.nameTextView.setText(place.getName());
         GeoPoint location = place.location();
         if (location != null) {
             Glide.with(binding.imageView)

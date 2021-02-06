@@ -54,6 +54,13 @@ public class Place implements Serializable {
     @SerializedName("boundingbox")
     private List<String> boundingXox = null;
 
+    public String getName() {
+        if (TextUtils.isEmpty(name)) {
+            return displayName;
+        }
+        return name;
+    }
+
     public String formattedAddress() {
         if (address == null) {
             return displayName;
