@@ -3,9 +3,9 @@
 OpenStreetMap Place Picker for Android. Based on OSMdroid
 
 <div>
-  <img src="https://github.com/bullheadandplato/MuftPlacePicker/raw/master/screens/search.png" width="300" height="500"/>
-  <img src="https://github.com/bullheadandplato/MuftPlacePicker/raw/master/screens/map.png" width="300" height="500"/>
-  <img src="https://github.com/bullheadandplato/MuftPlacePicker/raw/master/screens/dialog.png" width="300" height="500"/>
+  <img src="https://github.com/bullheadandplato/MuftPlacePicker/raw/master/screens/search.png" width="300" height="600"/>
+  <img src="https://github.com/bullheadandplato/MuftPlacePicker/raw/master/screens/map.png" width="300" height="600"/>
+  <img src="https://github.com/bullheadandplato/MuftPlacePicker/raw/master/screens/dialog.png" width="300" height="600"/>
 </div>
 
 ## How To Use
